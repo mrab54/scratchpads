@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { Md5 } from 'ts-md5';
+import { md5 } from './md5';
 import * as vscode from 'vscode';
 import {
   CONFIG_SCRATCHPADS_FOLDER,
@@ -8,7 +8,6 @@ import {
   GLOBAL_SCRATCHPADS_FOLDER_NAME,
   RECENT_FILETYPES_FILE,
   SCRATCHPADS_FOLDER_NAME,
-  STORAGE_V2_BREAKING_CHANGE_SHOWN,
 } from './consts';
 
 export class Config {
@@ -39,7 +38,6 @@ export class Config {
       
       await this.migrateConfig();
       this.recalculatePaths();
-      await this.showV2BreakingChangeNotification();
     } catch (error) {
       console.error('[Scratchpads] Config.init error:', error);
       throw error;
@@ -103,9 +101,10 @@ export class Config {
 
       const workspaceFolder = vscode.workspace.workspaceFolders?.[0]?.uri?.fsPath;
 
-      this.customPath = this.getExtensionConfiguration(CONFIG_SCRATCHPADS_FOLDER) as string;
+      const rawCustomPath = this.getExtensionConfiguration(CONFIG_SCRATCHPADS_FOLDER) as string;
+      this.customPath = rawCustomPath ? this.expandPath(rawCustomPath) : '';
       this.scratchpadsRootPath = path.join(this.customPath || this.globalPath, SCRATCHPADS_FOLDER_NAME);
-      this.projectPathMD5 = workspaceFolder ? Md5.hashStr(workspaceFolder) : '';
+      this.projectPathMD5 = workspaceFolder ? md5(workspaceFolder) : '';
 
       // Use global folder if configured, otherwise use project-specific folders
       if (this.shouldUseGlobalFolder(workspaceFolder)) {
@@ -157,32 +156,25 @@ export class Config {
   }
 
   /**
-   * Shows a one-time notification about v2.0.0 breaking changes
+   * Expands environment variables and ~ in a path string.
+   * Supports %VAR% (Windows), $VAR, ${VAR} (Unix), and leading ~ (home directory).
+   * Unresolved variables are replaced with an empty string.
    */
-  public static async showV2BreakingChangeNotification(): Promise<void> {
-    // Check if notification was already shown
-    const hasShown = this.context.globalState.get(STORAGE_V2_BREAKING_CHANGE_SHOWN, false);
-    if (hasShown) {
-      return;
+  private static expandPath(p: string): string {
+    // Expand ~ at the start of the path
+    if (p.startsWith('~')) {
+      const home = process.env.HOME || process.env.USERPROFILE || '';
+      p = home + p.slice(1);
     }
 
-    // Show the notification
-    const action = await vscode.window.showWarningMessage(
-      'Scratchpads v2.0.0: Due to a bugfix, your existing scratchpads may not appear in the UI. Your files are safe on the disk! Refer to the README for more details.',
-      'Open Folder',
-      'Do not show again',
-    );
+    // Expand %VAR% (Windows-style)
+    p = p.replace(/%([^%]+)%/g, (_, varName) => process.env[varName] || '');
 
-    if (action === 'Open Folder') {
-      // Import Utils dynamically to avoid circular dependency
-      const { default: Utils } = await import('./utils');
-      await Utils.openScratchpadsFolder();
+    // Expand ${VAR} and $VAR (Unix-style)
+    p = p.replace(/\$\{([^}]+)\}/g, (_, varName) => process.env[varName] || '');
+    p = p.replace(/\$([A-Za-z_][A-Za-z0-9_]*)/g, (_, varName) => process.env[varName] || '');
 
-      // Still mark as shown after opening folder
-      await this.context.globalState.update(STORAGE_V2_BREAKING_CHANGE_SHOWN, true);
-    } else if (action === 'Do not show again') {
-      // Mark as shown so it won't appear again
-      await this.context.globalState.update(STORAGE_V2_BREAKING_CHANGE_SHOWN, true);
-    }
+    return p;
   }
+
 }

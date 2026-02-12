@@ -2,20 +2,16 @@
   "name": "scratchpads",
   "displayName": "Scratchpads",
   "description": "Create multiple scratchpad files of different file types",
-  "version": "2.1.0",
-  "publisher": "buenon",
+  "version": "3.0.0",
+  "publisher": "mrab54",
   "author": {
-    "name": "Nadav Bueno",
-    "email": "buenonadav@gmail.com"
-  },
-  "sponsor": {
-    "url": "https://github.com/sponsors/buenon"
+    "name": "mrab54"
   },
   "license": "MIT",
-  "homepage": "https://github.com/buenon/scratchpads/blob/master/README.md",
+  "homepage": "https://github.com/mrab54/scratchpads/blob/master/README.md",
   "repository": {
     "type": "git",
-    "url": "https://github.com/buenon/scratchpads"
+    "url": "https://github.com/mrab54/scratchpads"
   },
   "icon": "images/icon.png",
   "engines": {
@@ -32,7 +28,7 @@
       "properties": {
         "scratchpads.scratchpadsFolder": {
           "type": "string",
-          "description": "A custom full path in which the scratchpads will be stored (Note: Data will not be moved)."
+          "description": "A custom full path in which the scratchpads will be stored. Supports environment variables (%USERPROFILE%, $HOME, ~). Note: Data will not be moved."
         },
         "scratchpads.promptForRemoval": {
           "type": "boolean",
@@ -277,10 +273,7 @@
     "test": "node ./out/test/runTest.js",
     "vsix": "npx vsce package"
   },
-  "dependencies": {
-    "language-map": "^1.5.0",
-    "ts-md5": "^1.3.1"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/glob": "^7.2.0",
     "@types/mocha": "^9.1.1",
