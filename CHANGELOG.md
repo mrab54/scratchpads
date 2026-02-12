@@ -1,3 +1,18 @@
+## 3.0.0 (Fork)
+
+**Fork by mrab54** - Self-hosted build with zero third-party runtime dependencies.
+
+**Changes from upstream v2.1.0:**
+
+- Removed `ts-md5` dependency - replaced with pure TypeScript MD5 implementation (`src/md5.ts`)
+- Removed `language-map` dependency - inlined language-to-extension mappings (`src/languages.json`)
+- Zero runtime dependencies - nothing from npm is bundled into the extension artifact
+- Added `THIRD-PARTY-NOTICES` file for proper attribution of derived code
+- Replaced marketplace publish workflow with GitHub Releases CI/CD
+- Rebranded for self-hosted distribution via `.vsix` from GitHub Releases
+
+---
+
 ## 0.0.1
 
 - Initial release

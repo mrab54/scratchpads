@@ -2,9 +2,11 @@
 
 > **Create multiple scratchpad files for doodling while you're coding**
 
-A powerful VSCode extension that lets you create temporary files for quick notes, code snippets, and experimentation without cluttering your project workspace.
+A VSCode extension that lets you create temporary files for quick notes, code snippets, and experimentation without cluttering your project workspace.
 
-![Create new Scratchpad](https://raw.githubusercontent.com/buenon/scratchpads/master/images/scratchpad_new.gif)
+This is a personal fork of [buenon/scratchpads](https://github.com/buenon/scratchpads) with all third-party runtime dependencies removed and self-hosted distribution via GitHub Releases.
+
+![Create new Scratchpad](https://raw.githubusercontent.com/mrab54/scratchpads/master/images/scratchpad_new.gif)
 
 ## 🚨 **Breaking Changes in v2.0.0**
 
@@ -64,12 +66,21 @@ A powerful VSCode extension that lets you create temporary files for quick notes
 - **Debugging**: Isolate and test specific code sections
 - **Experimentation**: Try different approaches without cluttering your project
 
-## 🚀 Getting Started
+## Installation
 
-1. **Install** the extension from the VSCode marketplace
-2. **Open Command Palette** (`Ctrl+Shift+P` / `Cmd+Shift+P`)
-3. **Type** `Scratchpads: New scratchpad` and press Enter
-4. **Choose** your file type and start coding!
+Download the latest `.vsix` from [GitHub Releases](https://github.com/mrab54/scratchpads/releases) and install:
+
+```bash
+code --install-extension scratchpads-x.x.x.vsix
+```
+
+Or in VSCode: **Extensions** sidebar > **...** menu > **Install from VSIX...**
+
+## Getting Started
+
+1. **Open Command Palette** (`Ctrl+Shift+P` / `Cmd+Shift+P`)
+2. **Type** `Scratchpads: New scratchpad` and press Enter
+3. **Choose** your file type and start coding!
 
 ## 🎮 How to Use
 
@@ -172,21 +183,35 @@ When VS Code has no workspace or folder open:
 - **Organize by project** to keep scratchpads separate
 - **Add keyboard shortcuts** for your most-used commands
 
-## 💖 Support the Project
+## Building from Source
 
-If you find Scratchpads useful, consider supporting its development:
+```bash
+npm ci
+npm run package
+npx vsce package
+```
 
-- ⭐ [Star this repository](https://github.com/buenon/scratchpads)
-- 💝 [Say Thanks on GitHub](https://github.com/sponsors/buenon)
-- 🐛 [Report bugs or suggest features](https://github.com/buenon/scratchpads/issues)
-- 📢 Share with fellow developers
+This produces a `scratchpads-3.0.0.vsix` file you can install with:
 
-Your support helps maintain and improve Scratchpads!
+```bash
+code --install-extension scratchpads-3.0.0.vsix
+```
+
+## Fork Changes
+
+- Removed all third-party runtime dependencies (`ts-md5`, `language-map`)
+- Pure TypeScript MD5 implementation (`src/md5.ts`)
+- Inlined language-to-extension mappings (`src/languages.json`)
+- Zero supply chain risk - no npm packages bundled at runtime
+- Self-hosted distribution via GitHub Releases
 
 ## Source
 
-[GitHub](https://github.com/buenon/scratchpads)
+- Fork: [GitHub](https://github.com/mrab54/scratchpads)
+- Original: [GitHub](https://github.com/buenon/scratchpads)
 
 ## License
 
-[MIT](https://raw.githubusercontent.com/buenon/scratchpads/master/LICENSE)
+[MIT](https://raw.githubusercontent.com/mrab54/scratchpads/master/LICENSE)
+
+See [THIRD-PARTY-NOTICES](THIRD-PARTY-NOTICES) for attribution of derived code.

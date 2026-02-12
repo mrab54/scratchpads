@@ -149,27 +149,27 @@ export class FiletypesManager {
    * - Recent filetypes (user's recently used types)
    */
   private loadFiletypes() {
-    const langMap: Record<string, any> = require('language-map');
+    const langMap: Record<string, string[]> = require('./languages.json');
 
-    for (const [name, data] of Object.entries(langMap)) {
-      if (data.extensions) {
-        this.mainFiletypes.push({
-          name,
-          ext: data.extensions.shift(),
-        });
+    for (const [name, extensions] of Object.entries(langMap)) {
+      const exts = [...extensions]; // Clone to avoid mutating the imported data
+      this.mainFiletypes.push({
+        name,
+        ext: exts[0],
+      });
 
-        for (const ext of data.extensions) {
-          // Skip extensions with multiple dots (E.G. .rest.txt)
-          if (ext.lastIndexOf('.') > 0) {
-            continue;
-          }
-
-          const name = ext.substring(1).toUpperCase();
-          this.additionalFiletypes.push({
-            name,
-            ext,
-          });
+      for (let i = 1; i < exts.length; i++) {
+        const ext = exts[i];
+        // Skip extensions with multiple dots (E.G. .rest.txt)
+        if (ext.lastIndexOf('.') > 0) {
+          continue;
         }
+
+        const extName = ext.substring(1).toUpperCase();
+        this.additionalFiletypes.push({
+          name: extName,
+          ext,
+        });
       }
     }
 
