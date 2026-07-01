@@ -25,7 +25,7 @@ jobs:
         run: npm ci
 
       - name: Package VSIX
-        run: npx vsce package --out scratchpads.vsix
+        run: npx @vscode/vsce package --out scratchpads.vsix
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2

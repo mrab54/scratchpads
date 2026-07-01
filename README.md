@@ -71,7 +71,7 @@ This is a personal fork of [buenon/scratchpads](https://github.com/buenon/scratc
 Download the latest `.vsix` from [GitHub Releases](https://github.com/mrab54/scratchpads/releases) and install:
 
 ```bash
-code --install-extension scratchpads-x.x.x.vsix
+code --install-extension scratchpads.vsix
 ```
 
 Or in VSCode: **Extensions** sidebar > **...** menu > **Install from VSIX...**
@@ -188,13 +188,13 @@ When VS Code has no workspace or folder open:
 ```bash
 npm ci
 npm run package
-npx vsce package
+npx @vscode/vsce package --out scratchpads.vsix
 ```
 
-This produces a `scratchpads-3.0.0.vsix` file you can install with:
+This produces a `scratchpads.vsix` file you can install with:
 
 ```bash
-code --install-extension scratchpads-3.0.0.vsix
+code --install-extension scratchpads.vsix
 ```
 
 ## Fork Changes
