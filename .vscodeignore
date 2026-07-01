@@ -1,13 +1,28 @@
-.vscode/**
-.vscode-test/**
+# Only the webpack bundle in dist/ ships; ignore sources & build tooling.
+src/**
 out/**
 node_modules/**
-src/**
-.gitignore
-.yarnrc
 webpack.config.js
-vsc-extension-quickstart.md
-**/tsconfig.json
-**/.eslintrc.json
-**/*.map
+tsconfig.json
 **/*.ts
+**/*.map
+
+# Editor / repo / CI metadata — not needed in the published extension.
+.vscode/**
+.vscode-test/**
+.github/**
+.gitignore
+.gitattributes
+.eslintrc.json
+.prettierrc
+
+# Large demo GIF is only referenced by the README via an absolute GitHub URL,
+# so it doesn't need to be bundled (~339 KB, the bulk of the old package).
+images/scratchpad_new.gif
+
+# Maintainer-only docs (end users don't need these in the extension).
+RELEASING.md
+
+# Housekeeping
+**/*.vsix
+package-lock.json

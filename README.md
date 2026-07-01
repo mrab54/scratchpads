@@ -197,6 +197,10 @@ This produces a `scratchpads.vsix` file you can install with:
 code --install-extension scratchpads.vsix
 ```
 
+## Releasing
+
+Maintainers: releases are published automatically by CI when a `v*` tag is pushed. See **[RELEASING.md](RELEASING.md)** for the step-by-step.
+
 ## Fork Changes
 
 - Removed all third-party runtime dependencies (`ts-md5`, `language-map`)
