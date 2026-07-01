@@ -2,7 +2,7 @@
   "name": "scratchpads",
   "displayName": "Scratchpads",
   "description": "Create multiple scratchpad files of different file types",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "publisher": "mrab54",
   "author": {
     "name": "mrab54"
