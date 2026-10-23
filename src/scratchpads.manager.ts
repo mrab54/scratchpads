@@ -48,6 +48,10 @@ export class ScratchpadsManager {
           allowSpaces: true,
         });
 
+        if (filenameFromUser === undefined) {
+          return;
+        }
+
         if (filenameFromUser) {
           baseFilename = filenameFromUser;
         }
@@ -173,13 +177,19 @@ export class ScratchpadsManager {
     const finalFileName = renameWithExt ? newFileName : `${newFileName}${fileExt}`;
     const newFilePath = Utils.getScratchpadFilePath(finalFileName);
 
+    if (newFilePath === currentFilePath) {
+      return;
+    }
+
     const shouldProceed = await Utils.confirmOverwrite(newFilePath, finalFileName);
     if (!shouldProceed) {
       return;
     }
 
     try {
-      await activeEditor.document.save();
+      if (!(await activeEditor.document.save())) {
+        throw new Error('Could not save the scratchpad before renaming');
+      }
       await Utils.closeActiveEditor();
       await Utils.renameFile(currentFilePath, newFilePath);
       await Utils.openFile(newFilePath);
@@ -207,6 +217,7 @@ export class ScratchpadsManager {
     }
 
     const filePath = Utils.getScratchpadFilePath(selection);
+    await Utils.closeAllTabsForFile(filePath);
     fs.unlinkSync(filePath);
 
     window.showInformationMessage(`Scratchpads: Removed ${selection}`);
@@ -247,7 +258,7 @@ export class ScratchpadsManager {
     const isAutoFormat = Config.getExtensionConfiguration(CONFIG_AUTO_FORMAT);
     const data = isAutoPaste ? await vscode.env.clipboard.readText() : '';
 
-    fs.writeFileSync(filePath, data);
+    fs.writeFileSync(filePath, data, { flag: 'wx' });
     await Utils.openFile(filePath);
 
     if (isAutoPaste && isAutoFormat) {
@@ -297,7 +308,7 @@ export class ScratchpadsManager {
       }
 
       if (answer === 'Always') {
-        Config.setExtensionConfiguration(CONFIG_PROMPT_FOR_REMOVAL, false);
+        await Config.setExtensionConfiguration(CONFIG_PROMPT_FOR_REMOVAL, false);
       }
     }
 
@@ -330,7 +341,9 @@ export class ScratchpadsManager {
         if (tab.input instanceof vscode.TabInputText) {
           const tabPath = tab.input.uri.fsPath;
           if (scratchpadPaths.includes(tabPath)) {
-            await vscode.window.tabGroups.close(tab);
+            if (!(await vscode.window.tabGroups.close(tab))) {
+              throw new Error('Removal canceled while closing a scratchpad tab');
+            }
           }
         }
       }

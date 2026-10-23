@@ -30,6 +30,7 @@ export class ScratchpadTreeProvider implements vscode.TreeDataProvider<string> {
 
   dispose(): void {
     this.fileWatcher?.dispose();
+    this._onDidChangeTreeData.dispose();
   }
 
   /**
@@ -176,6 +177,10 @@ export class ScratchpadTreeProvider implements vscode.TreeDataProvider<string> {
     const finalFileName = renameWithExt ? newFileName : `${newFileName}${fileExt}`;
     const newFilePath = Utils.getScratchpadFilePath(finalFileName);
 
+    if (newFilePath === filePath) {
+      return;
+    }
+
     const shouldProceed = await Utils.confirmOverwrite(newFilePath, finalFileName);
     if (!shouldProceed) {
       return;
@@ -186,7 +191,9 @@ export class ScratchpadTreeProvider implements vscode.TreeDataProvider<string> {
 
       if (openEditor) {
         // File is open - handle tab management
-        await openEditor.document.save();
+        if (!(await openEditor.document.save())) {
+          throw new Error('Could not save the scratchpad before renaming');
+        }
         await vscode.window.showTextDocument(openEditor.document);
         await Utils.closeActiveEditor();
         await Utils.renameFile(filePath, newFilePath);

@@ -80,7 +80,7 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(cmd);
   }
 
-  vscode.workspace.onDidChangeConfiguration((event: vscode.ConfigurationChangeEvent) => {
+  context.subscriptions.push(vscode.workspace.onDidChangeConfiguration((event: vscode.ConfigurationChangeEvent) => {
     const affectedFolder = event.affectsConfiguration('scratchpads.scratchpadsFolder');
     const affectedGlobalFolder = event.affectsConfiguration('scratchpads.useGlobalFolder');
 
@@ -89,13 +89,13 @@ export async function activate(context: vscode.ExtensionContext) {
       // Refresh the tree view to show files from the new path
       treeViewProvider.refreshOnConfigChange();
     }
-  });
+  }));
 
   // Handle workspace folder changes
-  vscode.workspace.onDidChangeWorkspaceFolders(() => {
+  context.subscriptions.push(vscode.workspace.onDidChangeWorkspaceFolders(() => {
     Config.recalculatePaths();
     treeViewProvider.refreshOnConfigChange();
-  });
+  }));
 }
 
 /**

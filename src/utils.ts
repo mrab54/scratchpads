@@ -101,7 +101,9 @@ export default class Utils {
     if (!fs.existsSync(Config.projectScratchpadsPath)) {
       return [];
     }
-    return fs.readdirSync(Config.projectScratchpadsPath);
+    return fs.readdirSync(Config.projectScratchpadsPath, { withFileTypes: true })
+      .filter((entry) => entry.isFile())
+      .map((entry) => entry.name);
   }
 
   /**
@@ -110,6 +112,9 @@ export default class Utils {
    * @returns Full file path
    */
   public static getScratchpadFilePath(fileName: string): string {
+    if (!fileName || fileName === '.' || fileName === '..' || /[\\/]/.test(fileName) || path.isAbsolute(fileName)) {
+      throw new Error('Invalid scratchpad filename');
+    }
     return path.join(Config.projectScratchpadsPath, fileName);
   }
 
@@ -124,7 +129,10 @@ export default class Utils {
 
     try {
       // First attempt: Open in external file manager
-      await vscode.env.openExternal(vscode.Uri.file(folderPath));
+      fs.mkdirSync(folderPath, { recursive: true });
+      if (!(await vscode.env.openExternal(vscode.Uri.file(folderPath)))) {
+        throw new Error('Could not open external file manager');
+      }
     } catch (externalError) {
       try {
         // Second attempt: Open in new VS Code window
@@ -152,7 +160,7 @@ export default class Utils {
    */
   public static async openFile(filePath: string): Promise<void> {
     const doc = await vscode.workspace.openTextDocument(filePath);
-    vscode.window.showTextDocument(doc);
+    await vscode.window.showTextDocument(doc);
   }
 
   /**
@@ -163,7 +171,9 @@ export default class Utils {
     for (const tabGroup of vscode.window.tabGroups.all) {
       for (const tab of tabGroup.tabs) {
         if (tab.input instanceof vscode.TabInputText && tab.input.uri.fsPath === filePath) {
-          await vscode.window.tabGroups.close(tab);
+          if (!(await vscode.window.tabGroups.close(tab))) {
+            throw new Error('Removal canceled while closing a scratchpad tab');
+          }
         }
       }
     }
@@ -200,6 +210,7 @@ export default class Utils {
     return await InputBox.show({
       placeHolder: 'Enter new filename:',
       value: renameWithExt ? currentFileName : baseName,
+      allowSpaces: true,
     });
   }
 

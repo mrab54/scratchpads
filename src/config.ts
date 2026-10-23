@@ -50,24 +50,29 @@ export class Config {
    */
   private static async migrateConfig(): Promise<void> {
     const legacyConfig = this.extensionConfig.inspect(CONFIG_USE_SUBFOLDERS);
+    const currentConfig = this.extensionConfig.inspect(CONFIG_USE_GLOBAL_FOLDER);
 
     // Migrate workspace level
     if (legacyConfig?.workspaceValue !== undefined) {
-      await this.extensionConfig.update(
-        CONFIG_USE_GLOBAL_FOLDER,
-        !legacyConfig.workspaceValue,
-        vscode.ConfigurationTarget.Workspace,
-      );
+      if (currentConfig?.workspaceValue === undefined) {
+        await this.extensionConfig.update(
+          CONFIG_USE_GLOBAL_FOLDER,
+          !legacyConfig.workspaceValue,
+          vscode.ConfigurationTarget.Workspace,
+        );
+      }
       await this.extensionConfig.update(CONFIG_USE_SUBFOLDERS, undefined, vscode.ConfigurationTarget.Workspace);
     }
 
     // Migrate global level
     if (legacyConfig?.globalValue !== undefined) {
-      await this.extensionConfig.update(
-        CONFIG_USE_GLOBAL_FOLDER,
-        !legacyConfig.globalValue,
-        vscode.ConfigurationTarget.Global,
-      );
+      if (currentConfig?.globalValue === undefined) {
+        await this.extensionConfig.update(
+          CONFIG_USE_GLOBAL_FOLDER,
+          !legacyConfig.globalValue,
+          vscode.ConfigurationTarget.Global,
+        );
+      }
       await this.extensionConfig.update(CONFIG_USE_SUBFOLDERS, undefined, vscode.ConfigurationTarget.Global);
     }
   }
@@ -127,6 +132,7 @@ export class Config {
    * @returns The configuration value, or undefined if not found
    */
   public static getExtensionConfiguration(key: string) {
+    this.extensionConfig = vscode.workspace.getConfiguration('scratchpads');
     const config = this.extensionConfig.inspect(key);
 
     if (config?.workspaceValue !== undefined) {

@@ -4,6 +4,7 @@ import { window } from 'vscode';
 import { Config } from './config';
 import { CONFIG_DEFAULT_FILETYPE } from './consts';
 import { InputBox } from './input-box';
+import * as languages from './languages.json';
 
 export interface Filetype {
   name: string;
@@ -149,7 +150,7 @@ export class FiletypesManager {
    * - Recent filetypes (user's recently used types)
    */
   private loadFiletypes() {
-    const langMap: Record<string, string[]> = require('./languages.json');
+    const langMap: Record<string, string[]> = languages;
 
     for (const [name, extensions] of Object.entries(langMap)) {
       const exts = [...extensions]; // Clone to avoid mutating the imported data
@@ -188,11 +189,18 @@ export class FiletypesManager {
 
     // Load recent Filetypes
     if (fs.existsSync(Config.recentFiletypesFilePath)) {
-      const data = fs.readFileSync(Config.recentFiletypesFilePath, 'utf8');
-      const filetypes: Filetype[] = JSON.parse(data);
-
-      for (const fileType of filetypes) {
-        this.recentFiletypes.push(fileType);
+      try {
+        const data = fs.readFileSync(Config.recentFiletypesFilePath, 'utf8');
+        const filetypes: unknown = JSON.parse(data);
+        if (!Array.isArray(filetypes)) {
+          throw new Error('Expected a filetype list');
+        }
+        this.recentFiletypes = filetypes.filter((item): item is Filetype =>
+          typeof item?.name === 'string' && typeof item?.ext === 'string' && /^\.[a-zA-Z0-9_.-]+$/.test(item.ext),
+        );
+      } catch (error) {
+        console.error('Scratchpads: Could not load recent filetypes:', error);
+        window.showWarningMessage('Scratchpads: Could not load recent filetypes. Built-in filetypes are still available.');
       }
     }
 

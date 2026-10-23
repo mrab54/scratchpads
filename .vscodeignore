@@ -1,5 +1,6 @@
 # Only the webpack bundle in dist/ ships; ignore sources & build tooling.
 src/**
+test/**
 out/**
 node_modules/**
 webpack.config.js

@@ -185,8 +185,12 @@ When VS Code has no workspace or folder open:
 
 ## Building from Source
 
+Use Node.js 22.12 or newer for the development tools.
+
 ```bash
 npm ci
+npm run lint
+npm run test:unit
 npm run package
 npx @vscode/vsce package --out scratchpads.vsix
 ```
@@ -206,7 +210,7 @@ Maintainers: releases are published automatically by CI when a `v*` tag is pushe
 - Removed all third-party runtime dependencies (`ts-md5`, `language-map`)
 - Pure TypeScript MD5 implementation (`src/md5.ts`)
 - Inlined language-to-extension mappings (`src/languages.json`)
-- Zero supply chain risk - no npm packages bundled at runtime
+- No third-party npm packages bundled at runtime; development tooling still needs dependency updates
 - Self-hosted distribution via GitHub Releases
 
 ## Source

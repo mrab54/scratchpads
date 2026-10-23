@@ -19,7 +19,7 @@ export class InputBox {
   public static async show(options: InputBoxOptions): Promise<string | undefined> {
     const validChars = options.allowSpaces ? this.displayNameChars : this.filenameChars;
     const result = await this.createFilteredInputBox(options, validChars);
-    return result?.replace(/^[\.\s]+/, '').replace(/[\.\s]+$/, '').replace(/\.+/, '.');
+    return result?.replace(/^[\.\s]+/, '').replace(/[\.\s]+$/, '').replace(/\.{2,}/g, '.');
   }
 
   /**
@@ -49,12 +49,13 @@ export class InputBox {
       });
 
       inputBox.onDidAccept(() => {
-        inputBox.hide();
         resolve(inputBox.value);
+        inputBox.hide();
       });
 
       inputBox.onDidHide(() => {
         resolve(undefined);
+        inputBox.dispose();
       });
 
       inputBox.show();
